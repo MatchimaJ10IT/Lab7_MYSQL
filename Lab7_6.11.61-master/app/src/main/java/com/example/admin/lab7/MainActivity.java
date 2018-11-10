@@ -1,6 +1,7 @@
 package com.example.admin.lab7;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,11 +21,12 @@ public class MainActivity extends AppCompatActivity {
     private EditText txtStdName;
     private EditText txtStdTel;
     private EditText txtStdEmail;
-    private EditText editStdid;
-    private EditText editStdName;
-    private EditText editStdTel;
-    private EditText editStdEmail;
+    private EditText editStdid = null;
+    private EditText editStdName = null;
+    private EditText editStdTel = null;
+    private EditText editStdEmail = null;
     private Button btnSave;
+    private Button btnShow;
     private ListView dataView;
     private ListView clickView;
     private MySQLConnect mySQLConnect;
@@ -62,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 dataStdEmail = caltel.substring(indextel + 11);
 
                 showActionsDialog(pos);
-                return ture;
+                return true;
 
             }
         });
@@ -113,20 +115,63 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
-    public void showStudentDialog (final String StdId, final String StdName , final String StdTel ,final String StdEmail , final int pos ){
-        LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
-        promptView
-    }
-    public void update(){
-        items = mySQLConnect.getData();
-        adt = new ArrayAdapter<String>(  this, android.R.layout.simple_list_item_1, items);
-        dataView.setAdapter(adt);
-    }
 
-    public void init(){
-        txtName = (EditText)findViewById(R.id.txtName);
-        btnSave = (Button)findViewById(R.id.btnSave);
-        dataView = (ListView)findViewById(R.id.dataView);
-        mySQLConnect = new MySQLConnect(  MainActivity.this);
+
+    public void showStudentDialog (final String StdId, final String StdName , final String StdTel ,final String StdEmail , final int pos ) {
+        LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+        promptView = layoutInflater.inflate(R.layout.content_dialog, null);
+        AlertDialog.Builder alertDialogBuider = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuider.setView(promptView);
+
+        editStdId = promptView.findViewById(R.id.txtStdId);
+        editStdName = promptView.findViewById(R.id.txtStdName);
+        editStdTel = promptView.findViewById(R.layout.txtStdTel);
+        editStdEmail = promptView.findViewById(R.loyout.txtStdEmail);
+
+        editStdid.setText(StdId);
+        editStdName.setText(StdName);
+        editStdTel.setText(StdTel);
+        editStdEmail.setText(StdEmail);
+
+        alertDialogBuider.setCancelable(false)
+                .setPositiveButton("EDIT", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        mySQlConnect.upd_data(editStdId.getText().toString(), editStdName.getText().toString(), editStdTel.getText().toString(), editStdEmail.getText().toString());
+                        items.set(pos, editStdid.getText().toString() + "\n" + editStdName.getText().toString() + "\n"editStdTel.getText().toString() + "\n" + editStdEmail.getText().toString());
+                        dataView.setAdapter(adt);
+
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = alertDialogBuider.create();
+        alert.show();
+
+        public void update() {
+            items = mySQLConnect.getData();
+            adt = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
+            dataView.setAdapter(adt);
+        }
+
+        public void checkList() {
+            Intent refresh = new Intent(MainActivity.this, MainActivity.class);
+            finish();
+        }
+
+        public void init() {
+            txtStdid = findViewById(R.id.txtId);
+            txtStdName = findViewById(R.id.txtName);
+            txtStdTel = findViewById(R.id.txtTel);
+            txtStdEmail = findViewById(R.id.txtEmail);
+            btnSave = findViewById(R.id.btnSave);
+            btnShow = findViewById(R.id.btnShow);
+            dataView = findViewById(R.id.dataView);
+            mySQLConnect = new MySQLConnect(MainActivity.this);
+        }
     }
 }
